@@ -1,17 +1,23 @@
 const {test, expect} = require('@playwright/test');
 
 
-test('Playwright Browser context initialization', async ({browser}) =>
+test.only('Playwright Browser context initialization', async ({browser}) =>
 {
     // Initialization: browser parameters (plugins - cookies)
     const context = await browser.newContext();
     const page =  await context.newPage();
 
-    await page.goto("https://rahulshettyacademy.com/loginpagePractise/");
-
+    await page.goto('/loginpagePractise');
+    await page.locator("#username").type("Andmont");
+    await page.locator("#password").type("learning");
+    await page.locator("#signInBtn").click();
+    // verify incorrect username/pasword error and get the text
+    // use attribute as locator with partial name and assert the name
+    console.log(await page.locator("[style*=block]").textContent());
+    await expect(page.locator("[style*=block]")).toContainText('Incorrect');
 });
 
-test.only('Playwright page initialization', async ({page}) => {
+test('Playwright page initialization', async ({page}) => {
     // Default Initialization without parameters
     await page.goto("https://google.com/");
 
