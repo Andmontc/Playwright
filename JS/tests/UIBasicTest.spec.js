@@ -25,13 +25,19 @@ test.only('Playwright Browser context initialization', async ({browser}) =>
     // use of Fill intead of type
     await userName.fill(""); // clear the input
     await userName.fill("rahulshettyacademy");
-    await signIn.click();
+    await Promise.all(
+        [
+            page.waitForURL("/angularpractice/shop"),
+            signIn.click(),
+        ]
+    );
+
+    console.log(await cardTitles.allTextContents()); // get all the names in the CSS array
 
     // using parent and childs selectors
     console.log(await cardTitles.first().textContent()); // using first get the text name of the first element in the css array
     console.log(await cardTitles.nth(1).textContent()); // get the text name of the second element in the array
     console.log(await cardTitles.last().textContent()); // get the last element
-    console.log(await cardTitles.allTextContents()); // get all the names in the CSS array
     console.log(await page.locator("//a[contains(text(),'iphone X')]").textContent()); // Xpath Selector to do the same as CSS selector
 });
 
