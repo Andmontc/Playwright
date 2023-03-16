@@ -10,7 +10,7 @@ module.exports = defineConfig({
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 5000
+    timeout: 7000
   },
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -26,7 +26,7 @@ module.exports = defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { browserName: 'chromium', headless :false, },
+      use: { browserName: 'chromium', headless: false, },
     },
 
     /* Test against mobile viewports. */

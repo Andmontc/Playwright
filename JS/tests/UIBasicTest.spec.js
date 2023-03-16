@@ -6,15 +6,33 @@ test.only('Playwright Browser context initialization', async ({browser}) =>
     // Initialization: browser parameters (plugins - cookies)
     const context = await browser.newContext();
     const page =  await context.newPage();
+    // locators
+    const userName =  page.locator("#username");
+    const signIn = page.locator("#signInBtn");
+    const errorMsg = page.locator("[style*=block]");
+    const cardTitles = page.locator(".card-body a"); // CSS Selector
 
     await page.goto('/loginpagePractise');
-    await page.locator("#username").type("Andmont");
+    await userName.type("Andmont");
     await page.locator("#password").type("learning");
-    await page.locator("#signInBtn").click();
+    await signIn.click();
+
     // verify incorrect username/pasword error and get the text
     // use attribute as locator with partial name and assert the name
-    console.log(await page.locator("[style*=block]").textContent());
-    await expect(page.locator("[style*=block]")).toContainText('Incorrect');
+    console.log(await errorMsg.textContent());
+    await expect(errorMsg).toContainText('Incorrect');
+
+    // use of Fill intead of type
+    await userName.fill(""); // clear the input
+    await userName.fill("rahulshettyacademy");
+    await signIn.click();
+
+    // using parent and childs selectors
+    console.log(await cardTitles.first().textContent()); // using first get the text name of the first element in the css array
+    console.log(await cardTitles.nth(1).textContent()); // get the text name of the second element in the array
+    console.log(await cardTitles.last().textContent()); // get the last element
+    console.log(await cardTitles.allTextContents()); // get all the names in the CSS array
+    console.log(await page.locator("//a[contains(text(),'iphone X')]").textContent()); // Xpath Selector to do the same as CSS selector
 });
 
 test('Playwright page initialization', async ({page}) => {
