@@ -10,7 +10,7 @@ module.exports = defineConfig({
      * Maximum time expect() should wait for the condition to be met.
      * For example in `await expect(locator).toHaveText();`
      */
-    timeout: 7000
+    timeout: 5000
   },
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
