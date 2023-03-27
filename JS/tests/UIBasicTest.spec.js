@@ -71,7 +71,7 @@ test('Playwright controls', async ({page}) => {
 
 })
 
-test.only('Playwright chil and tab windows', async ({browser}) => {
+test('Playwright child and tab windows', async ({browser}) => {
 
     const context = await browser.newContext();
     const page =  await context.newPage();
