@@ -61,5 +61,23 @@ test ('Simple testcase on an app', async ({page}) => {
     await expect(page.locator(".hero-primary").nth(0)).toHaveText(" Thankyou for the order. ");
     const orderId = await page.locator("tr[class='ng-star-inserted'] label").textContent();
     console.log(orderId);
-    
+
+    // find the order in order historypage
+    await page.locator("label[routerlink='/dashboard/myorders']").click();
+    await page.locator("tbody").waitFor();
+    const orderRows = await page.locator("tbody tr");
+    for (let i=0; i<await orderRows.count(); i++) {
+        const orderHistoryId = await orderRows.nth(i).locator("th").textContent();
+        if(orderId.includes(orderHistoryId)) {
+            await orderRows.nth(i).locator("button").first().click();
+            break;
+        }
+    }
+
+    // assert the order email and country are correct  in details page
+    const emailInDetails = await page.locator("div p:nth-child(2)").nth(1).textContent();
+    const countryInDetails = await page.locator("div p:nth-child(3)").first().textContent();
+    expect (orderId.includes(await page.locator("//div[@class='col-text -main']").textContent())).toBeTruthy();
+    expect (emailInDetails.includes(userEmail)).toBeTruthy();
+    expect (countryInDetails.includes("Colombia")).toBeTruthy();
 });
