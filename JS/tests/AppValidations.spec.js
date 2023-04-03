@@ -29,3 +29,21 @@ test("popUp frames and hidden elements validations", async({page}) => {
     console.log(await iframePage.locator("div[class='text'] h2 span").textContent());
 
 });
+
+test("Screenshots and Visual validations", async({page}) => {
+
+    const hideBox = page.locator("#displayed-text");
+
+    await page.goto('/AutomationPractice');
+    await expect(hideBox).toBeVisible();
+    await page.locator("#displayed-text").screenshot({path: './screenshots/hiddenBox.png'});
+    await page.locator("#hide-textbox").click();
+    await page.screenshot({path: './screenshots/hidden.png'});
+    await expect(hideBox).toBeHidden();
+});
+
+test.only("Visual Comparission", async({page}) => {
+    await page.goto("https://www.google.com/");
+    expect(await page.screenshot()).toMatchSnapshot('googleLanding.png');
+
+});
