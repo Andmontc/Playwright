@@ -1,24 +1,20 @@
 const {test, expect} = require('@playwright/test');
-const{loginClientPage} = require('../../modelpages/loginClientPage').default;
-const{dashboardPage} = require('../../modelpages/dashboardPage').default;
-const{cartPage} = require('../../modelpages/cartPage').default;
-const{checkoutPage} = require('../../modelpages/checkoutPage').default;
-const{orderHistoryPage} = require('../../modelpages/orderHistoryPage').default;
-const{orderSummaryPage} = require('../../modelpages/orderSummaryPage').default
+const {POManager} = require('../../modelpages/POManager').default;
 
-test.only ('Simple testcase on an app', async ({page}) => {
+test ('Simple testcase on an app', async ({page}) => {
     const user = "anshika@gmail.com";
     const password = "Iamking@000";
     const productToMatch = "adidas original";
 
+    //POManager
+    const pageManager = new POManager(page);
     // Pages
-    const loginPage = new loginClientPage(page);
-    const dashPage = new dashboardPage(page);
-    const cartOrderPage = new cartPage(page);
-    const checkPage = new checkoutPage(page);
-    const orderPage = new orderHistoryPage(page);
-    const orderSum = new orderSummaryPage(page);
-    
+    const loginPage = pageManager.getLoginPage();
+    const dashPage = pageManager.getDashPage();
+    const cartOrderPage = pageManager.getCartOrderPage();
+    const checkPage = pageManager.getCheckPage();
+    const orderPage = pageManager.getOrderPage();
+    const orderSum = pageManager.getOrderSum();
     // go to login page
     await loginPage.goToLogin();
     await loginPage.validLogin(user, password);
