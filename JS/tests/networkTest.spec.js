@@ -1,6 +1,6 @@
 const {test, expect, request} = require('@playwright/test');
 
-const{Apiutils} = require('./Utils/Apiutils').default;
+const{Apiutils} = require('../../Utils/Apiutils').default;
 const loginPayload = {
     userEmail: "anshika@gmail.com",
     userPassword: "Iamking@000"
