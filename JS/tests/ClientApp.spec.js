@@ -1,83 +1,65 @@
 const {test, expect} = require('@playwright/test');
+const{loginClientPage} = require('../../modelpages/loginClientPage').default;
+const{dashboardPage} = require('../../modelpages/dashboardPage').default;
+const{cartPage} = require('../../modelpages/cartPage').default;
+const{checkoutPage} = require('../../modelpages/checkoutPage').default;
+const{orderHistoryPage} = require('../../modelpages/orderHistoryPage').default;
+const{orderSummaryPage} = require('../../modelpages/orderSummaryPage').default
 
-
-test ('Simple testcase on an app', async ({page}) => {
+test.only ('Simple testcase on an app', async ({page}) => {
+    const user = "anshika@gmail.com";
+    const password = "Iamking@000";
     const productToMatch = "adidas original";
-    const email = page.locator("#userEmail");
-    const userEmail = "anshika@gmail.com";
-    const password = page.locator("#userPassword");
-    const login = page.locator("#login");
-    const products = page.locator(".card-body");
-    const cart = page.locator("[routerlink='/dashboard/cart']");
-    const countryOptions = page.locator("//section[@class='ta-results list-group ng-star-inserted']");
 
-    await page.goto('/client');
-    await email.fill(userEmail);
-    await password.fill("Iamking@000");
-    await login.click();
+    // Pages
+    const loginPage = new loginClientPage(page);
+    const dashPage = new dashboardPage(page);
+    const cartOrderPage = new cartPage(page);
+    const checkPage = new checkoutPage(page);
+    const orderPage = new orderHistoryPage(page);
+    const orderSum = new orderSummaryPage(page);
+    
+    // go to login page
+    await loginPage.goToLogin();
+    await loginPage.validLogin(user, password);
 
-    await page.waitForLoadState('networkidle');
-    console.log(await page.locator(".card-body b").allTextContents());
+    // get the titles of the products
 
-    // count the number of elements matching a css selector
-    const numberOfProdcts = await products.count();
+    let titles = await dashPage.getProductTitles();
+    console.log(titles);
 
-    // iterate in the elements 
-    for (let i = 0; i < numberOfProdcts; i++) {
-        let productName = await products.nth(i).locator("b").textContent();
-        if(productName === productToMatch) {
-            // add to cart
-            await products.nth(i).locator("text= Add To Cart").click();
-            break;
-        }
-    }
+    // add the product to the cart
+    await dashPage.addProduct(productToMatch);
+
+    // go to cart page
+    await dashPage.navigateToCart();
+
     // assert the product is in the cart page
-    await cart.click();
-    await page.locator("div li").first().waitFor();
-    const productPresent = await page.locator("h3",{hasText:productToMatch}).isVisible();
+    let productPresent = await cartOrderPage.checkProductInCart(productToMatch);
     expect(productPresent).toBeTruthy();
-    await page.locator("li[class='totalRow'] button[type='button']").click();
+    await cartOrderPage.clickOrderBtn();
 
     // fill payment method page
-    await page.locator("(//select[@class='input ddl'])[1]").selectOption("12");
-    await page.locator("(//select[@class='input ddl'])[2]").selectOption("22");
-    await page.locator("(//input[@type='text'])[2]").fill("123");
-    await page.locator("(//input[@type='text'])[3]").fill("Andmont");
-    await page.locator("//input[@placeholder='Select Country']").type("col",{delay:100});
-    await countryOptions.waitFor();
-    const numberOfCountries = await countryOptions.locator("button").count();
-    for(let j = 0; j < numberOfCountries; j++){
-        let country = await countryOptions.locator("button").nth(j).textContent();
-        if(country.trim() === "Colombia"){
-            await countryOptions.locator("button").nth(j).click();
-            break;
-        }
-    }
+    await checkPage.fillPayment();
+
     // assert the email
-    await expect(page.locator(".user__name.mt-5 label").nth(0)).toHaveText(userEmail);
+    let userEmail = await checkPage.checkPaymentEmail();
+    expect(userEmail).toContain(user);
+    await checkPage.clickSubmit();
 
     // place order
-    await page.locator(".btnn.action__submit.ng-star-inserted").click();
-    await expect(page.locator(".hero-primary").nth(0)).toHaveText(" Thankyou for the order. ");
-    const orderId = await page.locator("tr[class='ng-star-inserted'] label").textContent();
-    console.log(orderId);
+    let orderTitle = await orderPage.getOrderTitles();
+    expect(orderTitle).toContain(" Thankyou for the order. ");
+    let orderId = await orderPage.getOrderId();
 
     // find the order in order historypage
-    await page.locator("label[routerlink='/dashboard/myorders']").click();
-    await page.locator("tbody").waitFor();
-    const orderRows = await page.locator("tbody tr");
-    for (let i=0; i<await orderRows.count(); i++) {
-        const orderHistoryId = await orderRows.nth(i).locator("th").textContent();
-        if(orderId.includes(orderHistoryId)) {
-            await orderRows.nth(i).locator("button").first().click();
-            break;
-        }
-    }
+    await orderPage.goToOrderHistory();
+    await orderPage.getOrderHistory(orderId);
 
     // assert the order email and country are correct  in details page
-    const emailInDetails = await page.locator("div p:nth-child(2)").nth(1).textContent();
-    const countryInDetails = await page.locator("div p:nth-child(3)").first().textContent();
-    expect (orderId.includes(await page.locator("//div[@class='col-text -main']").textContent())).toBeTruthy();
-    expect (emailInDetails.includes(userEmail)).toBeTruthy();
-    expect (countryInDetails.includes("Colombia")).toBeTruthy();
+    let details = await orderSum.orderSummaryDetails();
+    expect (details[0].includes(user)).toBeTruthy();
+    expect (details[1].includes("Colombia")).toBeTruthy();
+    expect (orderId.includes(details[2])).toBeTruthy();
+
 });
