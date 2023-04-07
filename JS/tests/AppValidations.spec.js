@@ -1,6 +1,6 @@
 const {test, expect} = require('@playwright/test');
 
-
+test.describe.configure({mode: 'parallel'});
 test("popUp frames and hidden elements validations", async({page}) => {
 
     const hideBox = page.locator("#displayed-text");
@@ -42,7 +42,7 @@ test("Screenshots and Visual validations", async({page}) => {
     await expect(hideBox).toBeHidden();
 });
 
-test.only("Visual Comparission", async({page}) => {
+test("Visual Comparission", async({page}) => {
     await page.goto("https://www.google.com/");
     expect(await page.screenshot()).toMatchSnapshot('googleLanding.png');
 
